@@ -184,3 +184,84 @@ char **splitArgument(char *str)
 
     return argumentArray;
 }
+
+void logout(char *str)
+{
+    char *hostname = getHostname();
+
+    if (strncmp(str, "exit", 4) == 0)
+    {
+        printf("See you later %s!", hostname);
+        puts(" ");
+        printf("Exiting program...\n");
+    }
+    exit(0);
+}
+
+char *myRecoverString(char **arguments, char *delim)
+{
+    char *recoveredString = arguments[0] + 1;
+
+    char **p = arguments;
+    while (*p != NULL)
+    {
+        char *s = *p;
+        while (1)
+        {
+            if (*s == '\0')
+            {
+                *s = *delim;
+                break;
+            }
+            s++;
+            if (*s == '"')
+            {
+                *s = '\0';
+                return recoveredString;
+            }
+        }
+        p++;
+    }
+
+    recoveredString[strlen(recoveredString) - 1] = '\0';
+    return recoveredString;
+}
+
+void cd(char *path)
+{
+    if (chdir(path) != 0)
+    {
+        printf("Error: No such file or directory '%s'\n", path);
+    }
+}
+
+void cp(char *source_path, char *destination_path)
+{
+    if (source_path == NULL || destination_path == NULL)
+    {
+        printf("Usage: cp source_file destination_file\n");
+        return;
+    }
+
+    char ch;
+    FILE *src, *des;
+
+    if ((src = fopen(source_path, "r")) == NULL)
+    {
+        perror("Error opening source file");
+        return;
+    }
+
+    if ((des = fopen(destination_path, "a")) == NULL)
+    {
+        fclose(src);
+        perror("Error opening destination file");
+        return;
+    }
+
+    while ((ch = fgetc(src)) != EOF)
+        fputc(ch, des);
+
+    fclose(src);
+    fclose(des);
+}

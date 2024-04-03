@@ -17,3 +17,7 @@ void getLocation();
 char *my_strtok(char *, const char *);
 char *inputFromUser();
 char **splitArgument(char *);
+void logout(char *);
+char *myRecoverString(char **, char *);
+void cd(char *);
+void cp(char *, char *);
