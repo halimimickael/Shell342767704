@@ -327,3 +327,282 @@ void mypipe(char *cmd1[], char *cmd2[])
         exit(EXIT_FAILURE);
     }
 }
+
+void move(char **arguments)
+{
+    if (arguments[1] == NULL || arguments[2] == NULL)
+    {
+        if (arguments[1] == NULL)
+            printf("mv: source file missing\n");
+        else
+            printf("mv: destination directory missing after '%s'\n", arguments[1]);
+        return;
+    }
+
+    if (arguments[3] != NULL)
+    {
+        printf("mv: too many arguments\n");
+        return;
+    }
+
+    char *filename = arguments[1];
+    char *last_slash = filename;
+    while (*filename != '\0')
+    {
+        if (*filename == '/')
+        {
+            last_slash = filename + 1;
+        }
+        filename++;
+    }
+
+    char *destination_path = malloc(strlen(arguments[2]) + strlen(last_slash) + 2);
+    if (destination_path == NULL)
+    {
+        perror("mv: memory allocation failed");
+        return;
+    }
+    sprintf(destination_path, "%s/%s", arguments[2], last_slash);
+
+    int result = rename(arguments[1], destination_path);
+
+    if (result != 0)
+    {
+        printf("mv: failed to move '%s' to '%s'\n", arguments[1], arguments[2]);
+    }
+    else
+    {
+        printf("'%s' successfully moved to '%s'\n", arguments[1], arguments[2]);
+    }
+
+    free(destination_path);
+}
+
+void echo(char **argumnts)
+{
+    int i = 1;
+    while (argumnts[i] != NULL)
+        printf("%s ", argumnts[i++]);
+
+    puts("");
+}
+
+void echoappend(char **arguments)
+{
+    char *fileName = NULL;
+
+    for (char **arg = arguments + 1; *arg != NULL; arg++)
+    {
+        if (**arg == '>')
+        {
+            fileName = *(arg + 1);
+            if (*fileName == '"')
+            {
+                fileName = myRecoverString(arguments + (arg - arguments + 1), " ");
+            }
+            break;
+        }
+    }
+
+    if (fileName == NULL)
+    {
+        printf("File name not provided.\n");
+        return;
+    }
+
+    FILE *file = fopen(fileName, "a");
+    if (file == NULL)
+    {
+        printf("File '%s' does not exist. Creating new file.\n", fileName);
+        file = fopen(fileName, "w");
+        if (file == NULL)
+        {
+            printf("Error creating file '%s'.\n", fileName);
+            return;
+        }
+    }
+
+    for (char **arg = arguments + 1; *arg != NULL && **arg != '>'; arg++)
+    {
+        fprintf(file, "%s ", *arg);
+    }
+
+    fclose(file);
+}
+
+void echorite(char **arguments)
+{
+    char *fileName = NULL;
+
+    for (char **p = arguments; *p != NULL; p++)
+    {
+        if (**p == '>')
+        {
+            fileName = *(p + 1);
+            if (*fileName == '"')
+            {
+                fileName = myRecoverString(arguments + 2, " ");
+            }
+            break;
+        }
+    }
+
+    if (fileName == NULL)
+    {
+        printf("Error: File name not specified.\n");
+        return;
+    }
+
+    FILE *file = fopen(fileName, "w");
+    if (file == NULL)
+    {
+        printf("Error: Unable to open file '%s' for writing.\n", fileName);
+        return;
+    }
+
+    for (int i = 1; arguments[i] != NULL && strcmp(arguments[i], ">") != 0; i++)
+    {
+        fprintf(file, "%s ", arguments[i]);
+    }
+
+    fclose(file);
+}
+
+void readFile(char *filename)
+{
+    FILE *file = fopen(filename, "r");
+    if (file == NULL)
+    {
+        printf("Error: Unable to open file '%s' for reading.\n", filename);
+        return;
+    }
+
+    int ch;
+    while ((ch = fgetc(file)) != EOF)
+    {
+        putchar(ch);
+    }
+    printf("\n");
+
+    fclose(file);
+}
+
+void wordCount(char **arguments)
+{
+    if (arguments[1] == NULL || arguments[2] == NULL || arguments[3] != NULL)
+    {
+        puts("Usage: wc [-l|-w] [file]");
+        return;
+    }
+
+    FILE *file = fopen(arguments[2], "r");
+    if (file == NULL)
+    {
+        puts("Error: Unable to open file");
+        return;
+    }
+
+    int countWord = 0;
+    int countLine = 0;
+    int inWord = 0;
+    char pChar = '\0';
+
+    for (char ch; (ch = fgetc(file)) != EOF; pChar = ch)
+    {
+        if (isspace(ch))
+        {
+            if (inWord)
+            {
+                countWord++;
+                inWord = 0;
+            }
+            if (ch == '\n')
+            {
+                countLine++;
+            }
+        }
+        else
+        {
+            inWord = 1;
+        }
+    }
+
+    if (inWord && !isspace(pChar))
+    {
+        countWord++;
+    }
+
+    fclose(file);
+
+    if (strcmp(arguments[1], "-l") == 0)
+    {
+        printf("%d %s\n", countLine + 1, arguments[2]);
+    }
+    else if (strcmp(arguments[1], "-w") == 0)
+    {
+        printf("%d %s\n", countWord, arguments[2]);
+    }
+    else
+    {
+        printf("Error: Unable option --> '%c'\n", arguments[1][1]);
+    }
+}
+
+void systemCall(char **arguments)
+{
+    pid_t pid = fork();
+    if (pid == -1)
+    {
+        printf("fork err\n");
+        return;
+    }
+    if (pid == 0 && execvp(arguments[0], arguments) == -1)
+        exit(1);
+}
+
+void get_dir()
+{
+    DIR *directory;
+    struct dirent *entry;
+
+    directory = opendir(".");
+
+    if (directory == NULL)
+    {
+        perror("Error opening directory");
+        return;
+    }
+
+    while ((entry = readdir(directory)) != NULL)
+    {
+        printf("%s    ", entry->d_name);
+    }
+    puts(" ");
+    closedir(directory);
+}
+
+void makeDirectory(char *dirname)
+{
+    if (mkdir(dirname, 0777) == -1)
+    {
+        perror("Error creating directory");
+    }
+    else
+    {
+        printf("Directory '%s' created successfully.\n", dirname);
+    }
+}
+
+void createFile(char *filename)
+{
+    FILE *file = fopen(filename, "w");
+    if (file == NULL)
+    {
+        perror("Error creating file");
+    }
+    else
+    {
+        printf("File '%s' created successfully.\n", filename);
+        fclose(file);
+    }
+}

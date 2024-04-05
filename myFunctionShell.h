@@ -6,6 +6,8 @@
 #include <errno.h>
 #include <netdb.h>
 #include <dirent.h>
+#include <sys/wait.h>
+#include <sys/stat.h>
 
 void green();
 void purple();
@@ -23,3 +25,13 @@ void cd(char *);
 void cp(char *, char *);
 void my_delete(char **);
 void mypipe(char *cmd1[], char *cmd2[]);
+void move(char **);
+void echo(char **);
+void echoappend(char **);
+void echorite(char **);
+void readFile(char *);
+void wordCount(char **);
+void systemCall(char **);
+void get_dir();
+void makeDirectory(char *);
+void createFile(char *);

@@ -46,6 +46,56 @@ int main()
         {
             my_delete(arguments);
         }
+        else if (strcmp(str, "mv") == 0)
+        {
+            move(arguments);
+        }
+        else if (strcmp(str, "mv") == 0)
+        {
+            move(arguments);
+        }
+        else if (strcmp(str, "echo") == 0)
+        {
+            char **sub = arguments + 1;
+            while (*sub != NULL)
+            {
+                if (strcmp(*sub, ">") == 0)
+                {
+                    echorite(arguments);
+                }
+                else if (strcmp(*sub, ">>") == 0)
+                {
+                    echoappend(arguments);
+                }
+                sub++;
+            }
+            echo(arguments);
+        }
+        else if (strcmp(str, "read") == 0)
+        {
+            readFile(arguments[1]);
+        }
+        else if (strcmp(str, "wc") == 0)
+        {
+            wordCount(arguments);
+        }
+        else if (strcmp(str, "ls") == 0)
+        {
+            get_dir();
+        }
+        else if (strcmp(str, "mkdir") == 0)
+        {
+            makeDirectory(arguments[1]);
+        }
+        else if (strcmp(str, "touch") == 0)
+        {
+            createFile(arguments[1]);
+        }
+        else
+        {
+            systemCall(arguments);
+            wait(NULL);
+        }
         free(str);
         free(arguments);
     }
