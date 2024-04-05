@@ -50,29 +50,29 @@ void welcome()
 
 char *getHostname()
 {
-    char hostname[256];
+    char *hostname = NULL;
+    char tempHostname[256];
 
-    if (gethostname(hostname, sizeof(hostname)) == -1)
+    if (gethostname(tempHostname, sizeof(tempHostname)) == -1)
     {
         perror("Error getting hostname");
         exit(EXIT_FAILURE);
     }
 
-    struct hostent *host_entry;
-    host_entry = gethostbyname(hostname);
-    if (host_entry == NULL)
+    hostname = strdup(tempHostname);
+    if (hostname == NULL)
     {
-        perror("Error getting host entry");
+        perror("Error allocating memory for hostname");
         exit(EXIT_FAILURE);
     }
 
-    strcpy(hostname, host_entry->h_name);
-    return strdup(hostname);
+    return hostname;
 }
 
 void getLocation()
 {
     char location[256];
+
     if (getcwd(location, sizeof(location)) == NULL)
     {
         puts("Error");
@@ -264,4 +264,66 @@ void cp(char *source_path, char *destination_path)
 
     fclose(src);
     fclose(des);
+}
+
+void my_delete(char **args)
+{
+    if (args[1] == NULL)
+    {
+        printf("Usage: delete [file_path]\n");
+        return;
+    }
+
+    char *path = args[1];
+
+    if (*path == '"')
+    {
+        path = myRecoverString(args + 1, " ");
+    }
+    if (remove(path) != 0)
+    {
+        printf("Error: Failed to delete '%s'\n", path);
+    }
+    else
+    {
+        printf("Deleted '%s' successfully\n", path);
+    }
+    if (path != args[1])
+        free(path);
+}
+
+void mypipe(char *cmd1[], char *cmd2[])
+{
+    int pfd[2];
+
+    if (pipe(pfd) == -1)
+    {
+        perror("pipe");
+        exit(EXIT_FAILURE);
+    }
+
+    pid_t pid = fork();
+    if (pid == -1)
+    {
+        perror("fork");
+        exit(EXIT_FAILURE);
+    }
+    else if (pid == 0)
+    {
+        close(pfd[1]);
+        dup2(pfd[0], STDIN_FILENO);
+        close(pfd[0]);
+        execvp(cmd1[0], cmd1);
+        perror("execvp");
+        exit(EXIT_FAILURE);
+    }
+    else
+    {
+        close(pfd[0]);
+        dup2(pfd[1], STDOUT_FILENO);
+        close(pfd[1]);
+        execvp(cmd2[0], cmd2);
+        perror("execvp");
+        exit(EXIT_FAILURE);
+    }
 }

@@ -13,6 +13,18 @@ int main()
             logout(str);
             break;
         }
+        while (arguments[i] != NULL)
+        {
+            if (strcmp(arguments[i], "|") == 0)
+            {
+                char **cmd1 = arguments;
+                char **cmd2 = arguments + i + 1;
+                arguments[i] = NULL;
+                mypipe(cmd1, cmd2);
+                break;
+            }
+            i++;
+        }
         else if (strcmp(str, "cd") == 0)
         {
             if (*arguments[1] == '"')
@@ -28,6 +40,10 @@ int main()
         else if (strcmp(str, "cp") == 0)
         {
             cp(arguments[1], arguments[2]);
+        }
+        else if (strcmp(str, "delete") == 0)
+        {
+            my_delete(arguments);
         }
         free(str);
         free(arguments);

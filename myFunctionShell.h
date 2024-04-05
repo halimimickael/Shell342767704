@@ -21,3 +21,5 @@ void logout(char *);
 char *myRecoverString(char **, char *);
 void cd(char *);
 void cp(char *, char *);
+void my_delete(char **);
+void mypipe(char *cmd1[], char *cmd2[]);
