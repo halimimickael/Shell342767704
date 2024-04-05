@@ -13,6 +13,7 @@ int main()
             logout(str);
             break;
         }
+        int i = 0;
         while (arguments[i] != NULL)
         {
             if (strcmp(arguments[i], "|") == 0)
@@ -25,7 +26,7 @@ int main()
             }
             i++;
         }
-        else if (strcmp(str, "cd") == 0)
+        if (strcmp(str, "cd") == 0)
         {
             if (*arguments[1] == '"')
             {
