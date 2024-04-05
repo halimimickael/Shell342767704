@@ -48,6 +48,11 @@ void welcome()
     puts("\n");
 }
 
+/*
+This function retrieves the computer name and returns it as
+a dynamically allocated string. If an error occurs, it exits
+the program displaying an error message.
+*/
 char *getHostname()
 {
     char *hostname = NULL;
@@ -69,6 +74,13 @@ char *getHostname()
     return hostname;
 }
 
+/*
+This function gets the current path of the working
+directory and displays it along with the username
+and computer name. It changes the text color for
+the user name, computer name, and working directory
+path.
+*/
 void getLocation()
 {
     char location[256];
@@ -92,6 +104,12 @@ void getLocation()
     free(hostname);
 }
 
+/*
+This function splits a string into tokens using a series
+of specified delimiters. It returns the next token found
+in the chain, updating the position of the next token for
+subsequent calls. If no token is found, it returns NULL.
+*/
 char *my_strtok(char *str, const char *delimitation)
 {
     static char *next_token = NULL;
@@ -149,6 +167,13 @@ char *my_strtok(char *str, const char *delimitation)
     return token_start;
 }
 
+/*
+This function retrieves user input from the console,
+character by character, until a newline is encountered.
+It dynamically allocates memory to store the string
+entered by the user, increasing its size as characters
+are added. Finally, it returns the complete string.
+*/
 char *inputFromUser()
 {
     char ch;
@@ -164,6 +189,14 @@ char *inputFromUser()
     return str;
 }
 
+/*
+This function splits a string into substrings
+using a specified delimiter, then stores these
+substrings in an argument array. It dynamically
+allocates memory for the argument array and
+substrings, increasing its size as needed.
+Finally, it returns the argument array.
+*/
 char **splitArgument(char *str)
 {
 
@@ -185,6 +218,11 @@ char **splitArgument(char *str)
     return argumentArray;
 }
 
+/*
+This function checks if the string passed as an argument
+begins with "exit". If so, it displays a logout message
+with the computer name and then exits the program.
+*/
 void logout(char *str)
 {
     char *hostname = getHostname();
@@ -198,6 +236,11 @@ void logout(char *str)
     exit(0);
 }
 
+/*
+This function reconstructs a string from an array of arguments,
+removing the double quotes around each argument. It returns the
+reconstructed string.
+*/
 char *myRecoverString(char **arguments, char *delim)
 {
     char *recoveredString = arguments[0] + 1;
@@ -227,6 +270,12 @@ char *myRecoverString(char **arguments, char *delim)
     return recoveredString;
 }
 
+/*
+This function changes the current working directory to the one
+specified by the path passed as an argument. If the directory
+change fails, it displays an error message stating that no file
+or directory matching the specified path was found.
+*/
 void cd(char *path)
 {
     if (chdir(path) != 0)
@@ -235,6 +284,10 @@ void cd(char *path)
     }
 }
 
+/*
+This function copies the contents of a source file to a destination file,
+displaying an error message if the files fail to open.
+*/
 void cp(char *source_path, char *destination_path)
 {
     if (source_path == NULL || destination_path == NULL)
@@ -266,6 +319,12 @@ void cp(char *source_path, char *destination_path)
     fclose(des);
 }
 
+/*
+This function deletes a file specified by the path passed as an argument.
+If no path is provided, it displays a usage message. If the path contains
+double quotes, it handles them before attempting to delete the file. Then,
+it displays a message indicating the success or failure of deleting the file.
+*/
 void my_delete(char **args)
 {
     if (args[1] == NULL)
@@ -292,6 +351,13 @@ void my_delete(char **args)
         free(path);
 }
 
+/*
+This function creates a communication pipe between two child processes using
+the pipe function, then creates two child processes with fork to execute the
+two specified commands. It then redirects data flows between child processes
+using dup2 and closes unnecessary file descriptors. If there is an error
+creating the pipe or processes, it displays a corresponding error message.
+*/
 void mypipe(char *cmd1[], char *cmd2[])
 {
     int pfd[2];
@@ -328,6 +394,13 @@ void mypipe(char *cmd1[], char *cmd2[])
     }
 }
 
+/*
+This function moves a specified file to a specified destination directory.
+It first checks if the arguments are correct, then extracts the file name
+from the source path. Then it dynamically allocates memory for the full
+path of the destination file, moves it, and displays an appropriate success
+or failure message. Finally, it frees the dynamically allocated memory.
+*/
 void move(char **arguments)
 {
     if (arguments[1] == NULL || arguments[2] == NULL)
@@ -378,6 +451,10 @@ void move(char **arguments)
     free(destination_path);
 }
 
+/*
+This function displays the arguments passed to the "echo"
+command separated by a space, followed by a newline.
+*/
 void echo(char **argumnts)
 {
     int i = 1;
@@ -387,6 +464,14 @@ void echo(char **argumnts)
     puts("");
 }
 
+/*
+This function supports "echo" operation with output redirection
+to a file. It looks for the name of the destination file in the
+arguments, opens it in append mode ("a") or write mode ("w") if
+it does not exist, and then writes the contents to the file.
+Finally, she closes the file. If no file name is provided, it
+displays an error message.
+*/
 void echoappend(char **arguments)
 {
     char *fileName = NULL;
@@ -430,6 +515,14 @@ void echoappend(char **arguments)
     fclose(file);
 }
 
+/*
+This function implements a simplified version of the "echo"
+operation with output redirection to a file. It looks for the
+name of the destination file in the arguments, opens it in
+write ("w") mode, and then writes the contents to the file.
+Finally, she closes the file. If no file name is provided, it
+displays an error message.
+*/
 void echorite(char **arguments)
 {
     char *fileName = NULL;
@@ -468,6 +561,12 @@ void echorite(char **arguments)
     fclose(file);
 }
 
+/*
+This function opens a specified file in read ("r") mode, reads its
+contents character by character with fgetc, and prints it to standard
+output. Finally, she closes the file. If the file cannot be opened,
+it displays an error message.
+*/
 void readFile(char *filename)
 {
     FILE *file = fopen(filename, "r");
@@ -487,6 +586,14 @@ void readFile(char *filename)
     fclose(file);
 }
 
+/*
+This function counts words and/or lines in a specified file based on
+the options passed as arguments. It first checks the validity of the
+arguments and opens the file in read mode. Then it reads the file
+character by character, counting words and lines. Finally, it displays
+the counting result according to the specified option or displays an
+error message if the option is not recognized.
+*/
 void wordCount(char **arguments)
 {
     if (arguments[1] == NULL || arguments[2] == NULL || arguments[3] != NULL)
@@ -548,6 +655,14 @@ void wordCount(char **arguments)
     }
 }
 
+/*
+This function executes a system command with the specified arguments.
+It first creates a child process using the fork function. Then, in
+the child process, it uses execvp to execute the specified command
+with its arguments. If the execution fails, it exits the child process
+with exit code 1. If the creation of the child process fails, it
+displays an error message.
+*/
 void systemCall(char **arguments)
 {
     pid_t pid = fork();
@@ -560,6 +675,13 @@ void systemCall(char **arguments)
         exit(1);
 }
 
+/*
+This function opens the current directory using the opendir function,
+then reads the directory entries using readdir. It then displays the
+name of each file or directory contained in the current directory.
+Finally, she closes the directory using closedir. If an error occurs
+while opening the directory, it displays an error message.
+*/
 void get_dir()
 {
     DIR *directory;
@@ -581,6 +703,14 @@ void get_dir()
     closedir(directory);
 }
 
+/*
+This function creates a directory with the specified name.
+It uses the mkdir function to create the directory with
+permissions 0777 (all rights for user, group and others).
+If the creation fails, it displays an error message with
+perror. Otherwise, it displays a success message indicating
+that the directory was created successfully.
+*/
 void makeDirectory(char *dirname)
 {
     if (mkdir(dirname, 0777) == -1)
@@ -593,6 +723,14 @@ void makeDirectory(char *dirname)
     }
 }
 
+/*
+This function creates a file with the specified name.
+It uses the fopen function to open the file in write
+mode ("w"). If the opening fails, it displays an error
+message with perror. Otherwise, it displays a success
+message indicating that the file was created successfully,
+and then closes the file with fclose.
+*/
 void createFile(char *filename)
 {
     FILE *file = fopen(filename, "w");
